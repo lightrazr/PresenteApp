@@ -1,0 +1,68 @@
+.course-detail-container {
+  padding-top: 1rem;
+  padding-bottom: 2rem;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .grid-2 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.action-card {
+  height: 180px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+.primary-action {
+  background: linear-gradient(145deg, rgba(99, 102, 241, 0.1), rgba(79, 70, 229, 0.2));
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+.primary-action:hover {
+  background: linear-gradient(145deg, rgba(99, 102, 241, 0.2), rgba(79, 70, 229, 0.3));
+  border-color: rgba(99, 102, 241, 0.5);
+}
+
+.secondary-action {
+  background: linear-gradient(145deg, rgba(236, 72, 153, 0.1), rgba(219, 39, 119, 0.2));
+  border-color: rgba(236, 72, 153, 0.3);
+}
+
+.secondary-action:hover {
+  background: linear-gradient(145deg, rgba(236, 72, 153, 0.2), rgba(219, 39, 119, 0.3));
+  border-color: rgba(236, 72, 153, 0.5);
+}
+
+.icon-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.bg-primary-light { background-color: var(--primary); }
+.bg-secondary-light { background-color: var(--secondary); }
+
+.no-underline { text-decoration: none; color: inherit; }
+
+.student-row {
+  border-radius: var(--radius-md);
+  transition: background 0.2s;
+}
+
+.student-row:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
