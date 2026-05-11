@@ -95,3 +95,79 @@ export const updateAttendanceDate = async (courseId, oldDate, newDate) => {
   const updates = records.map(r => ({ ...r, date: newDate }));
   await db.attendances.bulkPut(updates);
 };
+
+// ---- Backup & Restore ----
+
+const blobToBase64 = (blob) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+};
+
+const base64ToBlob = (base64) => {
+  const [meta, data] = base64.split(',');
+  const mime = meta.match(/:(.*?);/)[1];
+  const binary = atob(data);
+  const array = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) array[i] = binary.charCodeAt(i);
+  return new Blob([array], { type: mime });
+};
+
+export const exportDatabase = async () => {
+  const courses = await db.courses.toArray();
+  const students = await db.students.toArray();
+  const attendances = await db.attendances.toArray();
+
+  // Convert Blob avatars to base64 for JSON serialization
+  const studentsWithBase64 = await Promise.all(
+    students.map(async (s) => {
+      if (s.avatar instanceof Blob) {
+        return { ...s, avatar: await blobToBase64(s.avatar), _avatarIsBlob: true };
+      }
+      return s;
+    })
+  );
+
+  return {
+    version: 1,
+    exportDate: new Date().toISOString(),
+    app: 'PresenteApp',
+    data: {
+      courses,
+      students: studentsWithBase64,
+      attendances
+    }
+  };
+};
+
+export const importDatabase = async (backup) => {
+  if (!backup || backup.app !== 'PresenteApp') {
+    throw new Error('El archivo no es un backup válido de PresenteApp.');
+  }
+
+  const { courses, students, attendances } = backup.data;
+
+  // Restore Blob avatars from base64
+  const studentsWithBlobs = students.map((s) => {
+    if (s._avatarIsBlob && s.avatar) {
+      const blob = base64ToBlob(s.avatar);
+      const { _avatarIsBlob, ...rest } = s;
+      return { ...rest, avatar: blob };
+    }
+    const { _avatarIsBlob, ...rest } = s;
+    return rest;
+  });
+
+  await db.transaction('rw', db.courses, db.students, db.attendances, async () => {
+    await db.courses.clear();
+    await db.students.clear();
+    await db.attendances.clear();
+
+    await db.courses.bulkAdd(courses);
+    await db.students.bulkAdd(studentsWithBlobs);
+    await db.attendances.bulkAdd(attendances);
+  });
+};
