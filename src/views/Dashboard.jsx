@@ -88,7 +88,7 @@ export const Dashboard = () => {
 
   return (
     <div className="container dashboard-container">
-      <header className="dashboard-header flex items-center justify-between">
+      <header className="dashboard-header flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="heading-1 text-gradient">PresenteApp</h1>
           <p className="text-muted">Toma de asistencia simple y rápida</p>
