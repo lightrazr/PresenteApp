@@ -2,7 +2,8 @@ import Papa from 'papaparse';
 
 export const exportToCsv = (data, filename) => {
   const csv = Papa.unparse(data);
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  // Añadir BOM (\uFEFF) para que Excel reconozca correctamente los caracteres UTF-8 como la Ñ o las tildes
+  const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
   const link = document.createElement('a');
   
   if (navigator.msSaveBlob) { // IE 10+
